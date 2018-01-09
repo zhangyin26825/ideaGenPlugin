@@ -58,14 +58,12 @@ public class ClassInfoInit {
                 set.add(vFile);
             }
         }
-        System.out.println("获取所有java目录的数量为"+set.size());
+
         return  set;
     }
 
     public  void  handldDir(VirtualFile dir){
-        System.out.println("当前遍历的目录名称为"+dir.getName());
         VirtualFile[] children = dir.getChildren();
-        System.out.println("当前遍历的目录的子元素数量为"+children.length);
         for (VirtualFile child : children) {
             if(child.isDirectory()){
                 handldDir(child);

@@ -1,19 +1,24 @@
 package com.zhangyin;
 
+import com.intellij.lang.Language;
 import com.intellij.lang.StdLanguages;
 import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.popup.*;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.source.PsiImportListImpl;
 import com.intellij.psi.search.FilenameIndex;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
+import com.intellij.refactoring.typeCook.deductive.PsiTypeVariableFactory;
+import com.intellij.util.IncorrectOperationException;
 import com.zhangyin.init.ClassInfoInit;
 import com.zhangyin.init.GlobalClass;
 
@@ -21,6 +26,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 public class GenAction extends AnAction {
 
@@ -33,6 +39,65 @@ public class GenAction extends AnAction {
 
         ClassInfoInit classInfoInit=new ClassInfoInit();
         classInfoInit.init();
+
+        List<VirtualFile> controllers = classInfoInit.getControllers();
+        VirtualFile virtualFile = controllers.get(0);
+
+        PsiJavaFile file = (PsiJavaFile)PsiManager.getInstance(GlobalClass.getProject()).findFile(virtualFile).getOriginalFile();
+//        System.out.println(file.getPackageName());
+//        PsiImportList importList = file.getImportList();
+//        PsiJavaCodeReferenceElement[] implicitlyImportedPackageReferences = file.getImplicitlyImportedPackageReferences();
+//        for (PsiJavaCodeReferenceElement element : implicitlyImportedPackageReferences) {
+//            System.out.println(element.getQualifiedName());
+//            System.out.println(element.getRangeInElement());
+//            System.out.println(element.getParameterList());
+//            System.out.println(element.getTypeParameters());
+//            System.out.println(element.getText());
+//
+//        }
+
+//        PsiElementFactory.SERVICE
+        PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(GlobalClass.getProject());
+
+        JavaPsiFacade instance = JavaPsiFacade.getInstance(GlobalClass.getProject());
+
+        PsiClass autowired = instance.findClass("org.springframework.beans.factory.annotation.Autowired", GlobalSearchScope.allScope(GlobalClass.getProject()));
+
+        PsiElement[] children = file.getChildren();
+
+        WriteCommandAction.runWriteCommandAction(GlobalClass.getProject(), new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("创建方法执行");
+                    PsiMethod methodFromText = elementFactory.createMethodFromText("public void hello(){ System.out.println(\"Hello\");}", file);
+
+                    PsiField field = elementFactory.createFieldFromText("@Autowired private PetApiController petApiController;", file);
+
+
+                    PsiImportStatement importStatement = elementFactory.createImportStatement(autowired);
+
+
+                    PsiElement[] elements = file.getChildren();
+                    for (PsiElement element : elements) {
+                        System.out.println(element.getClass());
+                        if(element instanceof PsiJavaDocumentedElement){
+                            element.add(methodFromText);
+                            element.add(field);
+                            System.out.println("新增方法成功");
+                        }
+                        if(element instanceof PsiImportListImpl){
+                            element.add(importStatement);
+                            System.out.println("新增导入成功");
+                        }
+                    }
+                } catch (IncorrectOperationException e1) {
+                    System.out.println(e1);
+                    e1.printStackTrace();
+                }
+            }
+        });
+        System.out.println("执行完毕");
 
 
         //获取项目的源码目录  一般的maven 项目 包含 src/main/java   src/main/resources 这两个目录

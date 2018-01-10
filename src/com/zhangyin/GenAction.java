@@ -13,6 +13,7 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.popup.*;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.PsiClassImpl;
 import com.intellij.psi.impl.source.PsiImportListImpl;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -21,16 +22,18 @@ import com.intellij.refactoring.typeCook.deductive.PsiTypeVariableFactory;
 import com.intellij.util.IncorrectOperationException;
 import com.zhangyin.init.ClassInfoInit;
 import com.zhangyin.init.GlobalClass;
+import com.zhangyin.ui.TableSelect;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GenAction extends AnAction {
 
-    JBPopup popup=null;
+
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -44,6 +47,22 @@ public class GenAction extends AnAction {
         VirtualFile virtualFile = controllers.get(0);
 
         PsiJavaFile file = (PsiJavaFile)PsiManager.getInstance(GlobalClass.getProject()).findFile(virtualFile).getOriginalFile();
+
+
+        List<TableClass> tableClassList=new ArrayList<>();
+        tableClassList.add(new TableClass("OperatingIncome"));
+        tableClassList.add(new TableClass("OperatingOutcome"));
+        JBPopup jbPopup=null;
+        TableSelect tableSelect=new TableSelect(jbPopup,tableClassList);
+
+        ComponentPopupBuilder componentPopupBuilder = JBPopupFactory.getInstance().createComponentPopupBuilder(tableSelect.getPanel1(), null);
+        componentPopupBuilder.setProject(GlobalClass.getProject());
+        componentPopupBuilder.setMinSize(new Dimension(200,400));
+
+        jbPopup = componentPopupBuilder.createPopup();
+        jbPopup.showInBestPositionFor(e.getDataContext());
+        tableSelect.setJbPopup(jbPopup);
+
 //        System.out.println(file.getPackageName());
 //        PsiImportList importList = file.getImportList();
 //        PsiJavaCodeReferenceElement[] implicitlyImportedPackageReferences = file.getImplicitlyImportedPackageReferences();
@@ -57,47 +76,70 @@ public class GenAction extends AnAction {
 //        }
 
 //        PsiElementFactory.SERVICE
-        PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(GlobalClass.getProject());
-
-        JavaPsiFacade instance = JavaPsiFacade.getInstance(GlobalClass.getProject());
-
-        PsiClass autowired = instance.findClass("org.springframework.beans.factory.annotation.Autowired", GlobalSearchScope.allScope(GlobalClass.getProject()));
-
-        PsiElement[] children = file.getChildren();
-
-        WriteCommandAction.runWriteCommandAction(GlobalClass.getProject(), new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    System.out.println("创建方法执行");
-                    PsiMethod methodFromText = elementFactory.createMethodFromText("public void hello(){ System.out.println(\"Hello\");}", file);
-
-                    PsiField field = elementFactory.createFieldFromText("@Autowired private PetApiController petApiController;", file);
-
-
-                    PsiImportStatement importStatement = elementFactory.createImportStatement(autowired);
-
-
-                    PsiElement[] elements = file.getChildren();
-                    for (PsiElement element : elements) {
-                        System.out.println(element.getClass());
-                        if(element instanceof PsiJavaDocumentedElement){
-                            element.add(methodFromText);
-                            element.add(field);
-                            System.out.println("新增方法成功");
-                        }
-                        if(element instanceof PsiImportListImpl){
-                            element.add(importStatement);
-                            System.out.println("新增导入成功");
-                        }
-                    }
-                } catch (IncorrectOperationException e1) {
-                    System.out.println(e1);
-                    e1.printStackTrace();
-                }
-            }
-        });
-        System.out.println("执行完毕");
+//        PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(GlobalClass.getProject());
+//
+//        JavaPsiFacade instance = JavaPsiFacade.getInstance(GlobalClass.getProject());
+//
+//        PsiClass autowired = instance.findClass("org.springframework.beans.factory.annotation.Autowired", GlobalSearchScope.allScope(GlobalClass.getProject()));
+//
+//        PsiElement[] children = file.getChildren();
+//
+//        WriteCommandAction.runWriteCommandAction(GlobalClass.getProject(), new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    System.out.println("创建方法执行");
+//                    PsiMethod methodFromText = elementFactory.createMethodFromText("public void hello(){ System.out.println(\"Hello\");}", file);
+//
+//                    PsiField field = elementFactory.createFieldFromText("@Autowired private PetApiController petApiController;", file);
+//
+//
+//
+//
+//                    PsiImportStatement importStatement = elementFactory.createImportStatement(autowired);
+//
+//
+//                    PsiElement[] elements = file.getChildren();
+//                    for (PsiElement element : elements) {
+//                        System.out.println(element.getClass());
+//                        if(element instanceof PsiJavaDocumentedElement){
+//                            element.add(methodFromText);
+//                            element.add(field);
+//                            System.out.println("新增方法成功");
+//                        }
+//                        if(element instanceof PsiImportListImpl){
+//                            element.add(importStatement);
+//                            System.out.println("新增导入成功");
+//                        }
+//                        if(element instanceof PsiClassImpl){
+//
+//                            PsiElement[] children1 = element.getChildren();
+//                            for (PsiElement psiElement : children1) {
+//                                System.out.println(psiElement);
+//                            }
+//
+//                        }
+//                    }
+//
+//
+//                    String name = field.getName();
+//                    System.out.println("fieldName    "+name);
+//                    PsiAnnotation[] annotations = field.getAnnotations();
+//                    for (PsiAnnotation annotation : annotations) {
+//                        System.out.println("annotation   "+annotation.getQualifiedName());
+//                        System.out.println(annotation.getParameterList());
+//
+//                    }
+//                    System.out.println(annotations);
+//
+//
+//                } catch (IncorrectOperationException e1) {
+//                    System.out.println(e1);
+//                    e1.printStackTrace();
+//                }
+//            }
+//        });
+//        System.out.println("执行完毕");
 
 
         //获取项目的源码目录  一般的maven 项目 包含 src/main/java   src/main/resources 这两个目录

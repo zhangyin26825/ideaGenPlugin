@@ -26,11 +26,34 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
+
+    <applicationService
+            serviceImplementation="com.zhangyin.mysqlconfig.MySqlPersistent"
+            serviceInterface="com.zhangyin.mysqlconfig.MySqlPersistent"
+    />
+
   </extensions>
 
   <actions>
-    <action id="csd.gen" class="com.zhangyin.GenAction" text="gen" description="generate controller service dao">
+    <!--<action id="csd.gen" class="com.zhangyin.GenAction" text="gen" description="generate controller service dao">-->
+      <!--<add-to-group group-id="CodeMenu" anchor="after" relative-to-action="Generate"/>-->
+    <!--</action>-->
+    <group id="csd.groupgen" text="genGoup" description=" gen group" popup="true">
       <add-to-group group-id="CodeMenu" anchor="after" relative-to-action="Generate"/>
+    </group>
+
+    <action id="csd.gen" class="com.zhangyin.GenAction" text="gen" description="generate controller service dao">
+      <add-to-group group-id="csd.groupgen" anchor="first" />
+    </action>
+
+    <action id="csd.gen2" class="com.zhangyin.GenAction" text="gen2" description="generate controller service dao">
+      <add-to-group group-id="csd.groupgen" anchor="first" />
+    </action>
+
+
+    <action id="csd.mysql.config" class="com.zhangyin.mysqlconfig.MysqlConfigMenu" text="mysql 配置"
+            description="配置mysql">
+      <add-to-group group-id="csd.groupgen" anchor="first" />
     </action>
   </actions>
 

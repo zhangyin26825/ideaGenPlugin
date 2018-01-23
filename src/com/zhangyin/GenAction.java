@@ -1,34 +1,14 @@
 package com.zhangyin;
 
-import com.intellij.lang.Language;
-import com.intellij.lang.StdLanguages;
 import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.ui.popup.*;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.source.PsiClassImpl;
-import com.intellij.psi.impl.source.PsiImportListImpl;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.PsiShortNamesCache;
-import com.intellij.refactoring.typeCook.deductive.PsiTypeVariableFactory;
-import com.intellij.util.IncorrectOperationException;
 import com.zhangyin.init.ClassInfoInit;
 import com.zhangyin.init.GlobalClass;
-import com.zhangyin.ui.TableSelect;
+import com.zhangyin.mysqlconfig.MySqlPersistent;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 public class GenAction extends AnAction {
@@ -40,6 +20,17 @@ public class GenAction extends AnAction {
         System.out.println("进入点击事件");
         GlobalClass.init(e);
 
+
+        MySqlPersistent.MySqlConfig mySqlConfig = MySqlPersistent.getMySqlConfig();
+        System.out.println("mysql用户名"+mySqlConfig.getUsername());
+
+        mySqlConfig.setUsername("zhangyin");
+        MySqlPersistent.saveMySqlConfig(mySqlConfig);
+
+        MySqlPersistent.MySqlConfig mySqlConfig1 = MySqlPersistent.getMySqlConfig();
+        System.out.println("mysql用户名"+mySqlConfig1.getUsername());
+
+
         ClassInfoInit classInfoInit=new ClassInfoInit();
         classInfoInit.init();
 
@@ -49,19 +40,53 @@ public class GenAction extends AnAction {
         PsiJavaFile file = (PsiJavaFile)PsiManager.getInstance(GlobalClass.getProject()).findFile(virtualFile).getOriginalFile();
 
 
-        List<TableClass> tableClassList=new ArrayList<>();
-        tableClassList.add(new TableClass("OperatingIncome"));
-        tableClassList.add(new TableClass("OperatingOutcome"));
-        JBPopup jbPopup=null;
-        TableSelect tableSelect=new TableSelect(jbPopup,tableClassList);
+        PsiPackage pkg = JavaPsiFacade.getInstance(GlobalClass.getProject()).findPackage(file.getPackageName());
+        PsiJavaFile fileFromText = (PsiJavaFile)PsiFileFactory.getInstance(GlobalClass.getProject()).createFileFromText("HelloWorldTest.java",JavaLanguage.INSTANCE,"package "+pkg.getQualifiedName()+";"
+                +"public class  HelloWorldTest{}");
 
-        ComponentPopupBuilder componentPopupBuilder = JBPopupFactory.getInstance().createComponentPopupBuilder(tableSelect.getPanel1(), null);
-        componentPopupBuilder.setProject(GlobalClass.getProject());
-        componentPopupBuilder.setMinSize(new Dimension(200,400));
 
-        jbPopup = componentPopupBuilder.createPopup();
-        jbPopup.showInBestPositionFor(e.getDataContext());
-        tableSelect.setJbPopup(jbPopup);
+
+//// 用编辑器打开指定文件
+//        FileEditorManager.getInstance(GlobalClass.getProject()).openTextEditor(new OpenFileDescriptor(project, virtualFile), true);
+
+
+
+
+//        PsiElement[] children = fileFromText.getChildren();
+//        PsiDirectory parent = file.getParent();
+//        parent.add(fileFromText);
+//        // 格式化代码
+//        CodeStyleManager.getInstance(GlobalClass.getProject()).reformat(fileFromText);
+        System.out.println("新增文件成功");
+
+//        System.out.println(file.getName());
+//
+//        System.out.println("fing useage");
+//        Query<PsiReference> search = ReferencesSearch.search(file );
+//
+//
+//        for (PsiReference psiReference : search) {
+//            PsiElement element = psiReference.getElement();
+//            System.out.println(element);
+//        }
+
+//        PropertiesComponent instance = PropertiesComponent.getInstance(GlobalClass.getProject());
+
+
+
+//        List<TableClass> tableClassList=new ArrayList<>();
+//        tableClassList.add(new TableClass("OperatingIncome"));
+//        tableClassList.add(new TableClass("OperatingOutcome"));
+//        JBPopup jbPopup=null;
+//        TableSelect tableSelect=new TableSelect(jbPopup,tableClassList);
+//
+//        ComponentPopupBuilder componentPopupBuilder = JBPopupFactory.getInstance().createComponentPopupBuilder(tableSelect.getPanel1(), null);
+//        componentPopupBuilder.setProject(GlobalClass.getProject());
+//        componentPopupBuilder.setMinSize(new Dimension(200,400));
+//
+//        jbPopup = componentPopupBuilder.createPopup();
+//        jbPopup.showInBestPositionFor(e.getDataContext());
+//        tableSelect.setJbPopup(jbPopup);
 
 //        System.out.println(file.getPackageName());
 //        PsiImportList importList = file.getImportList();

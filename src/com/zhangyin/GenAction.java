@@ -1,10 +1,12 @@
 package com.zhangyin;
 
+import com.intellij.codeInsight.actions.ReformatCodeAction;
 import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.zhangyin.init.ClassInfoInit;
 import com.zhangyin.init.GlobalClass;
 import com.zhangyin.mysqlconfig.MySqlPersistent;
@@ -57,6 +59,11 @@ public class GenAction extends AnAction {
 //        parent.add(fileFromText);
 //        // 格式化代码
 //        CodeStyleManager.getInstance(GlobalClass.getProject()).reformat(fileFromText);
+
+        JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(GlobalClass.getProject());
+
+        styleManager.optimizeImports(file);
+//        ReformatCodeAction
         System.out.println("新增文件成功");
 
 //        System.out.println(file.getName());

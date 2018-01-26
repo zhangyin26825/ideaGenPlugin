@@ -55,6 +55,10 @@
             description="配置mysql">
       <add-to-group group-id="csd.groupgen" anchor="first" />
     </action>
+      <action id="csd.generatetable" class="com.zhangyin.generatetable.GenerateTableMenu" text="生成表的实体类"
+              description="生成表">
+        <add-to-group group-id="csd.groupgen" anchor="first" />
+      </action>
   </actions>
 
 </idea-plugin>

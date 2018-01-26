@@ -4,10 +4,12 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Query;
+import com.zhangyin.directory.manage.DirectoryUtil;
 import com.zhangyin.init.GlobalClass;
 import com.zhangyin.jdbc.JdbcUtil;
 import com.zhangyin.jdbc.TableSql;
 import com.zhangyin.mysqlconfig.MySqlPersistent;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,12 +17,11 @@ import java.util.stream.Collectors;
 /**
  * 查询已经生成过实体类的表
  */
-public class GeneratorTableUtil {
+public class FindGeneratorTableUtil {
 
-    public static String Table="com.maqv.mysql.annotation.Table";
+    private  static String Table="com.maqv.mysql.annotation.Table";
 
-
-    public static PsiDirectory tablePackage;
+    private static List<TableSql>  generatedTable;
 
     /**
      * 根据 包含包名的完整类名   查找所有使用过这个类，java类
@@ -63,12 +64,22 @@ public class GeneratorTableUtil {
     }
 
     private static  List<TableSql>  getGeneratedTableSql(){
+        if(generatedTable!=null){
+            return generatedTable;
+        }
+        initGeneratedTable();
+        return generatedTable;
+    }
+
+    /**
+     * 初始化所有已经生成实体类的表
+     */
+    public static void  initGeneratedTable(){
         List<PsiJavaFile> search = search(Table);
         initTablePackage(search);
-        List<TableSql> collect = search.stream().map(javaFile -> {
+        generatedTable = search.stream().map(javaFile -> {
             return getTableSql(javaFile);
         }).collect(Collectors.toList());
-        return collect;
     }
 
     /**
@@ -76,14 +87,28 @@ public class GeneratorTableUtil {
      * @param search
      */
     private static void initTablePackage(List<PsiJavaFile> search){
+        if(DirectoryUtil.isInited()){
+            return;
+        }
+        Map<String, Long> collect = search.stream().map(p -> p.getPackageName()).filter(StringUtils::isNotEmpty).collect(Collectors.groupingBy(j -> j, Collectors.counting()));
+        Integer packageCount=0;
+        String tablepackage=null;
+        for(Map.Entry<String,Long> packageString:collect.entrySet()){
+            if(packageString.getValue().intValue()>packageCount.intValue()){
+                tablepackage=packageString.getKey();
+                packageCount=packageString.getValue().intValue();
+            }
+        }
+        DirectoryUtil.setTablePackage(tablepackage);
         Map<PsiDirectory, Long> collect1 = search.stream().map(PsiJavaFile::getParent).collect(Collectors.groupingBy(p -> p, Collectors.counting()));
         Integer count=0;
         for (Map.Entry<PsiDirectory, Long> psiDirectoryLongEntry : collect1.entrySet()) {
             if(psiDirectoryLongEntry.getValue().intValue()>count.intValue()){
-                tablePackage=psiDirectoryLongEntry.getKey();
+                DirectoryUtil.setPsiTableDirectory(psiDirectoryLongEntry.getKey());
                 count=psiDirectoryLongEntry.getValue().intValue();
             }
         }
+        DirectoryUtil.init();
 
     }
 
@@ -94,8 +119,17 @@ public class GeneratorTableUtil {
     public static List<TableSql> getAllNotGeneratorTable(){
         JdbcUtil jdbcUtil=new JdbcUtil(MySqlPersistent.getMySqlConfig());
         List<TableSql> tableSqls = jdbcUtil.queryAllTableName();
-        List<TableSql> generatedTableSql = GeneratorTableUtil.getGeneratedTableSql();
+        List<TableSql> generatedTableSql = FindGeneratorTableUtil.getGeneratedTableSql();
         tableSqls.removeAll(generatedTableSql);
         return tableSqls;
+    }
+
+    public static String getTable() {
+        return Table;
+    }
+
+
+    public static List<TableSql> getGeneratedTable() {
+        return generatedTable;
     }
 }

@@ -80,5 +80,11 @@ public class MySqlPersistent implements PersistentStateComponent<MySqlPersistent
         public void setPassword(String password) {
             this.password = password;
         }
+
+        public String getTableSchema(){
+            int i = jdbcURL.indexOf("?");
+            int i1 = jdbcURL.lastIndexOf("/");
+            return  jdbcURL.substring(i1+1, i);
+        }
     }
 }

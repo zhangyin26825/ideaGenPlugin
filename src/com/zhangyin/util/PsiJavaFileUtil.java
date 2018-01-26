@@ -1,8 +1,7 @@
 package com.zhangyin.util;
 
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiJavaFile;
+
 
 import java.util.ArrayList;
 import java.util.List;

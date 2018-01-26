@@ -99,12 +99,12 @@ public class FindGeneratorTableUtil {
                 packageCount=packageString.getValue().intValue();
             }
         }
-        DirectoryUtil.setTablePackage(tablepackage);
+        DirectoryUtil.setPoPackage(tablepackage);
         Map<PsiDirectory, Long> collect1 = search.stream().map(PsiJavaFile::getParent).collect(Collectors.groupingBy(p -> p, Collectors.counting()));
         Integer count=0;
         for (Map.Entry<PsiDirectory, Long> psiDirectoryLongEntry : collect1.entrySet()) {
             if(psiDirectoryLongEntry.getValue().intValue()>count.intValue()){
-                DirectoryUtil.setPsiTableDirectory(psiDirectoryLongEntry.getKey());
+                DirectoryUtil.setPsiPoDirectory(psiDirectoryLongEntry.getKey());
                 count=psiDirectoryLongEntry.getValue().intValue();
             }
         }

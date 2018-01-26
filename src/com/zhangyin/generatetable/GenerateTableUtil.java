@@ -4,6 +4,8 @@ import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiJavaFile;
+import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.zhangyin.directory.manage.DirectoryUtil;
 import com.zhangyin.init.GlobalClass;
 import com.zhangyin.jdbc.ColumnInfo;
@@ -24,14 +26,36 @@ public class GenerateTableUtil {
     public static void generateTable(TableSql tableSql){
         JdbcUtil jdbcUtil=new JdbcUtil();
         List<ColumnInfo> columnInfos = jdbcUtil.queryColumns(tableSql.getTableName());
-        PsiJavaFile javaFile = createJavaFile(tableSql);
+        createPo(tableSql,columnInfos);
+
     }
 
+    private static void createPo(TableSql tableSql,List<ColumnInfo> columnInfos){
+        //生成 idea类的 java对象类
+        PsiJavaFile javaFile = createPoJavaFile(tableSql);
+        //增加属性
+        addFieldToPsiJavaFile(javaFile,columnInfos);
+        //写进文件
+        WriteCommandAction.runWriteCommandAction(GlobalClass.getProject(), () -> {
+            JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(GlobalClass.getProject());
+            styleManager.optimizeImports(javaFile);
+            CodeStyleManager.getInstance(GlobalClass.getProject()).reformat(javaFile);
+            DirectoryUtil.getPsiPoDirectory().add(javaFile);
+        });
 
-    public static PsiJavaFile  createJavaFile(TableSql tableSql){
+    }
+
+    private static void addFieldToPsiJavaFile(PsiJavaFile javaFile,List<ColumnInfo> columnInfos){
+        for (ColumnInfo columnInfo : columnInfos) {
+
+
+        }
+    }
+
+    private static PsiJavaFile createPoJavaFile(TableSql tableSql){
         String className = convert.convertClassName(tableSql.getTableName());
         StringBuffer stringBuffer=new StringBuffer();
-        stringBuffer.append("package "+ DirectoryUtil.getTablePackage()+";\n");
+        stringBuffer.append("package "+ DirectoryUtil.getPoPackage()+";\n");
         stringBuffer.append("\n");
         stringBuffer.append("import com.maqv.mysql.annotation.Column;\n");
         stringBuffer.append("import com.maqv.mysql.annotation.Id;\n");
@@ -50,9 +74,6 @@ public class GenerateTableUtil {
         stringBuffer.append("\n");
         stringBuffer.append("}\n");
         PsiJavaFile fileFromText = (PsiJavaFile) PsiFileFactory.getInstance(GlobalClass.getProject()).createFileFromText(className+".java", JavaLanguage.INSTANCE,stringBuffer.toString());
-        WriteCommandAction.runWriteCommandAction(GlobalClass.getProject(), () -> {
-            DirectoryUtil.getPsiTableDirectory().add(fileFromText);
-        });
         return  fileFromText;
     }
 

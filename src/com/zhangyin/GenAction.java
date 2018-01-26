@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.zhangyin.init.ClassInfoInit;
 import com.zhangyin.init.GlobalClass;
@@ -58,7 +59,7 @@ public class GenAction extends AnAction {
 //        PsiDirectory parent = file.getParent();
 //        parent.add(fileFromText);
 //        // 格式化代码
-//        CodeStyleManager.getInstance(GlobalClass.getProject()).reformat(fileFromText);
+        CodeStyleManager.getInstance(GlobalClass.getProject()).reformat(fileFromText);
 
         JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(GlobalClass.getProject());
 

@@ -1,5 +1,6 @@
-package com.zhangyin.generatetable;
+package com.zhangyin.generatetable.impl;
 
+import com.zhangyin.generatetable.MysqlJavaConvert;
 import org.apache.commons.lang.StringUtils;
 
 public class MysqlJavaConvertImpl implements MysqlJavaConvert {

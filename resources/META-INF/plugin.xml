@@ -1,6 +1,6 @@
 <idea-plugin>
   <id>com.your.company.unique.plugin.id</id>
-  <name>Plugin display name here</name>
+  <name>VOffice DAO generate</name>
   <version>1.0</version>
   <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 
@@ -16,7 +16,7 @@
   </change-notes>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="173.0"/>
+  <idea-version since-build="171.0"/>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
        on how to target different products -->
@@ -41,15 +41,6 @@
     <group id="csd.groupgen" text="genGoup" description=" gen group" popup="true">
       <add-to-group group-id="CodeMenu" anchor="after" relative-to-action="Generate"/>
     </group>
-
-    <action id="csd.gen" class="com.zhangyin.GenAction" text="gen" description="generate controller service dao">
-      <add-to-group group-id="csd.groupgen" anchor="first" />
-    </action>
-
-    <action id="csd.gen2" class="com.zhangyin.GenAction" text="gen2" description="generate controller service dao">
-      <add-to-group group-id="csd.groupgen" anchor="first" />
-    </action>
-
 
     <action id="csd.mysql.config" class="com.zhangyin.mysqlconfig.MysqlConfigMenu" text="mysql 配置"
             description="配置mysql">

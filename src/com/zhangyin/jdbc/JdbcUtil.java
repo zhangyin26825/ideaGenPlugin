@@ -73,7 +73,6 @@ public class JdbcUtil {
         return null;
     }
 
-
     public List<ColumnInfo>  queryColumns(String tableName){
 
         String sql="select * from  information_schema.COLUMNS where TABLE_SCHEMA=? and TABLE_NAME=? order by ORDINAL_POSITION";
@@ -143,6 +142,23 @@ public class JdbcUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String  createTableSql(String tableName){
+        String sql="show create table "+tableName;
+
+        try {
+            Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet rSet = preparedStatement.executeQuery();
+            while(rSet.next()){
+                String string = rSet.getString(2);
+                return string;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }  return  null;
+
     }
 
 }

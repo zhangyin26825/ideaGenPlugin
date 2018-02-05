@@ -54,11 +54,11 @@ public class DirectoryUtil {
             for (PsiPackage subPackage : subPackages) {
                 if (subPackage.getName().equals("table")) {
                     tablePackage = subPackage.getQualifiedName();
-                    psiTableDirectory = (PsiDirectory) subPackage.getContainingFile();
+                    psiTableDirectory = (PsiDirectory) subPackage.getDirectories()[0];
                 }
                 if (subPackage.getName().equals("type")) {
                     typePackage = subPackage.getQualifiedName();
-                    psiTypeDirectory = (PsiDirectory) subPackage.getContainingFile();
+                    psiTypeDirectory = (PsiDirectory) subPackage.getDirectories()[0];
                 }
             }
         }
@@ -70,7 +70,7 @@ public class DirectoryUtil {
                 if (psiPackage.getName().equals("dao")) {
                     psiDaoPackage = psiPackage;
                     daoPackage = psiPackage.getQualifiedName();
-                    psiDaoDirectory = (PsiDirectory) psiPackage.getContainingFile();
+                    psiDaoDirectory = (PsiDirectory) psiPackage.getDirectories()[0];
                 }
 
             }
@@ -79,11 +79,11 @@ public class DirectoryUtil {
         for (PsiPackage subPackage : subPackages) {
             if(subPackage.getName().equals("impl")){
                 daoImplPackage=subPackage.getQualifiedName();
-                psiDaoImplDirectory=(PsiDirectory) subPackage.getContainingFile();
+                psiDaoImplDirectory=(PsiDirectory) subPackage.getDirectories()[0];
             }
             if(subPackage.getName().equals("mapper")){
                 mapperPackage=subPackage.getQualifiedName();
-                psiMapperDirectory=(PsiDirectory)subPackage.getContainingFile();
+                psiMapperDirectory=(PsiDirectory)subPackage.getDirectories()[0];
             }
 
         }
@@ -98,7 +98,9 @@ public class DirectoryUtil {
         PsiDirectory[] directories = root.getDirectories();
         for (PsiDirectory directory : directories) {
 
-            if(directory.getName().equals("resources")){
+            String path = directory.getVirtualFile().getPath();
+
+            if(directory.getName().equals("resources")&&path.contains("core/src/main")){
                 sqlDiretory= directory.findSubdirectory("db").findSubdirectory("migrations");
                 xmlMapperDirectory=directory.findSubdirectory("com").findSubdirectory("voffice")
                         .findSubdirectory("sz")
@@ -128,7 +130,105 @@ public class DirectoryUtil {
         System.out.println("实体类所在的包名为"+ poPackage);
     }
 
+    public static void setInited(boolean inited) {
+        DirectoryUtil.inited = inited;
+    }
 
+    public static String getTablePackage() {
+        return tablePackage;
+    }
+
+    public static void setTablePackage(String tablePackage) {
+        DirectoryUtil.tablePackage = tablePackage;
+    }
+
+    public static PsiDirectory getPsiTableDirectory() {
+        return psiTableDirectory;
+    }
+
+    public static void setPsiTableDirectory(PsiDirectory psiTableDirectory) {
+        DirectoryUtil.psiTableDirectory = psiTableDirectory;
+    }
+
+    public static String getTypePackage() {
+        return typePackage;
+    }
+
+    public static void setTypePackage(String typePackage) {
+        DirectoryUtil.typePackage = typePackage;
+    }
+
+    public static PsiDirectory getPsiTypeDirectory() {
+        return psiTypeDirectory;
+    }
+
+    public static void setPsiTypeDirectory(PsiDirectory psiTypeDirectory) {
+        DirectoryUtil.psiTypeDirectory = psiTypeDirectory;
+    }
+
+    public static String getDaoPackage() {
+        return daoPackage;
+    }
+
+    public static void setDaoPackage(String daoPackage) {
+        DirectoryUtil.daoPackage = daoPackage;
+    }
+
+    public static PsiDirectory getPsiDaoDirectory() {
+        return psiDaoDirectory;
+    }
+
+    public static void setPsiDaoDirectory(PsiDirectory psiDaoDirectory) {
+        DirectoryUtil.psiDaoDirectory = psiDaoDirectory;
+    }
+
+    public static String getDaoImplPackage() {
+        return daoImplPackage;
+    }
+
+    public static void setDaoImplPackage(String daoImplPackage) {
+        DirectoryUtil.daoImplPackage = daoImplPackage;
+    }
+
+    public static PsiDirectory getPsiDaoImplDirectory() {
+        return psiDaoImplDirectory;
+    }
+
+    public static void setPsiDaoImplDirectory(PsiDirectory psiDaoImplDirectory) {
+        DirectoryUtil.psiDaoImplDirectory = psiDaoImplDirectory;
+    }
+
+    public static String getMapperPackage() {
+        return mapperPackage;
+    }
+
+    public static void setMapperPackage(String mapperPackage) {
+        DirectoryUtil.mapperPackage = mapperPackage;
+    }
+
+    public static PsiDirectory getPsiMapperDirectory() {
+        return psiMapperDirectory;
+    }
+
+    public static void setPsiMapperDirectory(PsiDirectory psiMapperDirectory) {
+        DirectoryUtil.psiMapperDirectory = psiMapperDirectory;
+    }
+
+    public static PsiDirectory getSqlDiretory() {
+        return sqlDiretory;
+    }
+
+    public static void setSqlDiretory(PsiDirectory sqlDiretory) {
+        DirectoryUtil.sqlDiretory = sqlDiretory;
+    }
+
+    public static PsiDirectory getXmlMapperDirectory() {
+        return xmlMapperDirectory;
+    }
+
+    public static void setXmlMapperDirectory(PsiDirectory xmlMapperDirectory) {
+        DirectoryUtil.xmlMapperDirectory = xmlMapperDirectory;
+    }
 
     public static boolean isInited() {
         return inited;

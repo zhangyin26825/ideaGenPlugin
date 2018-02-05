@@ -30,7 +30,7 @@ public class FindGeneratorTableUtil {
      */
     private static List<PsiJavaFile> search(String fullpathClassName) {
         List<PsiJavaFile> result = new ArrayList<>();
-        PsiClass javaclass = getJavaClass(fullpathClassName);
+        PsiClass javaclass = ClassSearch.getJavaClass(fullpathClassName);
         Query<PsiReference> search = ReferencesSearch.search(javaclass, GlobalSearchScope.allScope(GlobalClass.getProject()));
         Set<PsiJavaFile> set=new HashSet<>();
         search.forEach(p->{
@@ -44,11 +44,7 @@ public class FindGeneratorTableUtil {
         return result;
     }
 
-    private static PsiClass  getJavaClass(String fullpathClassName){
-        JavaPsiFacade instance = JavaPsiFacade.getInstance(GlobalClass.getProject());
-        PsiClass javaclass = instance.findClass(fullpathClassName, GlobalSearchScope.allScope(GlobalClass.getProject()));
-        return javaclass;
-    }
+
     private static TableSql getTableSql(PsiJavaFile javaFile){
         PsiClass psiClass = javaFile.getClasses()[0];
         PsiAnnotation[] annotations = psiClass.getAnnotations();
@@ -120,8 +116,14 @@ public class FindGeneratorTableUtil {
         JdbcUtil jdbcUtil=new JdbcUtil(MySqlPersistent.getMySqlConfig());
         List<TableSql> tableSqls = jdbcUtil.queryAllTableName();
         List<TableSql> generatedTableSql = FindGeneratorTableUtil.getGeneratedTableSql();
-        tableSqls.removeAll(generatedTableSql);
-        return tableSqls;
+        Set<String> generateTables = generatedTableSql.stream().map(TableSql::getTableName).collect(Collectors.toSet());
+        List<TableSql> result=new ArrayList<>(tableSqls.size()-generatedTableSql.size());
+        for (TableSql tableSql : tableSqls) {
+            if(!generateTables.contains(tableSql.getTableName())){
+                result.add(tableSql);
+            }
+        }
+        return result;
     }
 
     public static String getTable() {
